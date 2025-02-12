@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import Loading from "../components/Loading/Loading";
+import Loading from "../../components/Loading/Loading";
 import { IRoutesProps, routes } from "./routes";
 
 interface GuardProps {

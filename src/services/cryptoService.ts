@@ -1,27 +1,34 @@
 import { PrismaClient } from '@prisma/client';
-import { PriceData } from '../types'; // Tipo compartido
+import { getBinancePrice } from './binanceService';
 
 const prisma = new PrismaClient();
+export const savePriceData = async (symbol: string) => {
+  try {
+    console.log(`Obteniendo precio para ${symbol}...`);
+    let priceData;
+    try {
+      priceData = await getBinancePrice(symbol);
+    } catch (binanceError) {
+      console.error('Error obteniendo precio de Binance:', binanceError);
+      return;
+    }
 
-export const savePriceData = async (symbol: string, priceData: Omit<PriceData, 'id'>[]) => {
-  await prisma.priceHistory.createMany({
-    data: priceData.map((data) => ({
-      symbol,
-      price: data.price,
-      timestamp: new Date(data.timestamp), // Convierte string a Date para Prisma
-    })),
-  });
-};
+    if (priceData && priceData.price) {
+      console.log(`Precio obtenido: ${priceData.price}`);
 
-export const getPriceData = async (symbol: string): Promise<PriceData[]> => {
-  const data = await prisma.priceHistory.findMany({
-    where: { symbol },
-    orderBy: { timestamp: 'asc' },
-  });
+      const newPriceHistory = await prisma.priceHistory.create({
+        data: {
+          symbol: priceData.symbol,
+          price: parseFloat(priceData.price),
+          timestamp: new Date(),
+        },
+      });
 
-  // Convierte Date a string ISO
-  return data.map((item) => ({
-    ...item,
-    timestamp: item.timestamp.toISOString(),
-  }));
+      console.log(`Precio de ${symbol} guardado exitosamente: ${newPriceHistory.price}`);
+    } else {
+      console.log(`No se obtuvo un precio para ${symbol}.`);
+    }
+  } catch (error) {
+    console.error('Error guardando los datos del precio:', error);
+  }
 };

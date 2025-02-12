@@ -1,15 +1,13 @@
+"use client";  
 
-import { Sidebar } from "@/app/components/organisms/home/Sidebar"
-import { DashboardTemplate } from "@/app/components/template/home/DashboardTemplate"
+import { useEffect } from 'react';
+import { redirect } from 'next/navigation';
 
-export default function Page() {
-  return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="grid lg:grid-cols-[280px_1fr]">
-        <Sidebar />
-        <DashboardTemplate />
-      </div>
-    </div>
-  )
+export default function HomePage() {
+  useEffect(() => {
+
+    redirect('/login');
+  }, []);
+
+  return ;
 }
-

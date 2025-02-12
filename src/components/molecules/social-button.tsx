@@ -1,5 +1,5 @@
 import type React from "react"
-import { Button } from "@/app/components/atoms/button"
+import { Button } from "@/components/atoms/button"
 
 interface SocialButtonProps {
   icon: React.ReactNode
