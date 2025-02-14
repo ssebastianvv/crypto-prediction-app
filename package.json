@@ -16,6 +16,7 @@
     "chart": "^0.1.2",
     "chart.js": "^4.4.7",
     "class-variance-authority": "^0.7.1",
+    "firebase": "^11.3.1",
     "lucide-react": "^0.475.0",
     "next": "15.1.6",
     "prisma": "^6.3.1",
