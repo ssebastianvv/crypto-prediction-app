@@ -1,5 +1,7 @@
+
 'use client';
 
+import { useEffect, useState, useCallback, SetStateAction } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import { Button } from "../../atoms/home/Button";
@@ -9,16 +11,17 @@ import { Card } from "../../ui/card";
 import { ChevronDown } from "lucide-react";
 import { getBinancePrice } from '@/services/binanceService';
 import { PriceData } from '@/types/index';
-import { useEffect, useState } from 'react';
 
-// Registramos los componentes de Chart.js
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 export function DashboardTemplate() {
   const [symbol, setSymbol] = useState('BTCUSDT');
   const [priceData, setPriceData] = useState<PriceData[]>([]);
+  const [investmentRecommendation, setInvestmentRecommendation] = useState<string | null>(null); // Para la recomendación
+  const [updateCount, setUpdateCount] = useState(0); // Contador de actualizaciones
 
-  const fetchBinancePrice = async () => {
+  // Llamada al servicio de Binance para obtener el precio
+  const fetchBinancePrice = useCallback(async () => {
     try {
       const priceInfo = await getBinancePrice(symbol);
       const newPriceData = {
@@ -27,34 +30,57 @@ export function DashboardTemplate() {
         price: parseFloat(priceInfo.price),
         timestamp: new Date().toISOString(),
       };
-      setPriceData((prevData) => [...prevData, newPriceData]); 
+      setPriceData((prevData) => [...prevData, newPriceData]);
+
+      setUpdateCount((prevCount) => {
+        const newCount = prevCount + 1;
+        if (newCount % 10 === 0) {
+          const marketData = priceData.map((data) => `Precio: ${data.price}, Timestamp: ${data.timestamp}`).join("\n");
+          
+          fetch("/api/openAi", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ prompt: marketData }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              setInvestmentRecommendation(data.reply); // Guardamos la recomendación
+            })
+            .catch((error) => {
+              console.error('Error fetching market analysis:', error);
+              setInvestmentRecommendation('Error al obtener recomendación.');
+            });
+        }
+        return newCount;
+      });
+
     } catch (error) {
       console.error('Error fetching Binance price:', error);
     }
-  };
+  }, [symbol, priceData]);
 
   useEffect(() => {
     const interval = setInterval(fetchBinancePrice, 5000);
-    return () => clearInterval(interval); 
-  }, [symbol]);
+    return () => clearInterval(interval);
+  }, [fetchBinancePrice]);
 
   const handleSymbolChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSymbol(event.target.value);
   };
 
-  // Transformamos el precio y timestamp en el formato adecuado para el gráfico
   const chartData = priceData.map((data) => ({
     date: new Date(data.timestamp).toLocaleTimeString(),
     value: data.price
   }));
 
-  // Configuración del gráfico
   const data = {
-    labels: chartData.map(item => item.date), // Fechas
+    labels: chartData.map(item => item.date),
     datasets: [
       {
         label: 'Price',
-        data: chartData.map(item => item.value), // Valores de los precios
+        data: chartData.map(item => item.value),
         borderColor: '#ff6b00',
         backgroundColor: 'rgba(255, 107, 0, 0.2)',
         fill: true,
@@ -63,7 +89,6 @@ export function DashboardTemplate() {
     ],
   };
 
-  // Opciones del gráfico
   const options = {
     responsive: true,
     scales: {
@@ -98,6 +123,12 @@ export function DashboardTemplate() {
           <ChevronDown className="h-4 w-4" />
         </Button>
       </div>
+
+      <select onChange={handleSymbolChange} value={symbol}>
+        <option value="BTCUSDT">BTC/USDT</option>
+        <option value="ETHUSDT">ETH/USDT</option>
+      </select>
+
       <div className="grid gap-4 md:grid-cols-3">
         <MetricsCard
           title="Your Balance"
@@ -115,34 +146,32 @@ export function DashboardTemplate() {
           change={{ value: "$1,340", percentage: "+1.2%", isPositive: true }}
         />
       </div>
+
       <Card className="mt-6 p-6">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold">General Statistics</h2>
           <div className="flex gap-2">
-            <Button size="sm" variant="ghost">
-              Today
-            </Button>
-            <Button size="sm" variant="ghost">
-              Last week
-            </Button>
-            <Button size="sm" variant="ghost">
-              Last month
-            </Button>
-            <Button size="sm" variant="ghost">
-              Last 6 month
-            </Button>
-            <Button size="sm" variant="ghost">
-              Year
-            </Button>
+            <Button size="sm" variant="ghost">Today</Button>
+            <Button size="sm" variant="ghost">Last week</Button>
+            <Button size="sm" variant="ghost">Last month</Button>
+            <Button size="sm" variant="ghost">Last 6 month</Button>
+            <Button size="sm" variant="ghost">Year</Button>
           </div>
         </div>
         <div className="relative w-full h-[500px]">
           <Line data={data} options={options} />
         </div>
       </Card>
+
       <div className="mt-6">
         <VaultTable />
       </div>
+
+      {investmentRecommendation && (
+        <div className="mt-6 text-lg font-semibold text-red-500">
+          {investmentRecommendation}
+        </div>
+      )}
     </main>
   );
 }

@@ -2,24 +2,31 @@ import { PrismaClient } from '@prisma/client';
 import { getBinancePrice } from './binanceService';
 
 const prisma = new PrismaClient();
+
+// Define a type for the price data returned by Binance
+interface PriceData {
+  symbol: string;
+  price: string;
+}
 export const savePriceData = async (symbol: string) => {
   try {
     console.log(`Obteniendo precio para ${symbol}...`);
-    let priceData;
+    
+    let binancePriceData: PriceData | undefined;
     try {
-      priceData = await getBinancePrice(symbol);
+      binancePriceData = await getBinancePrice(symbol);
     } catch (binanceError) {
       console.error('Error obteniendo precio de Binance:', binanceError);
       return;
     }
 
-    if (priceData && priceData.price) {
-      console.log(`Precio obtenido: ${priceData.price}`);
+    if (binancePriceData && binancePriceData.price) {
+      console.log(`Precio obtenido: ${binancePriceData.price}`);
 
       const newPriceHistory = await prisma.priceHistory.create({
         data: {
-          symbol: priceData.symbol,
-          price: parseFloat(priceData.price),
+          symbol: binancePriceData.symbol,
+          price: parseFloat(binancePriceData.price),
           timestamp: new Date(),
         },
       });
