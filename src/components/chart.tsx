@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
-import { PriceData } from '../../types'; // Tipo compartido
+import { PriceData } from '../types'; // Tipo compartido
 
 interface CryptoChartProps {
   data: PriceData[];

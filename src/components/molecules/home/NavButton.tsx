@@ -1,6 +1,6 @@
 import * as React from "react"
-import { Button } from "@/app/components/ui/button"
-import type { ButtonProps } from "@/app/components/ui/button"
+import { Button } from "@/components/ui/button"
+import type { ButtonProps } from "@/components/ui/button"
 import type { LucideIcon } from "lucide-react"
 
 interface NavButtonProps extends Omit<ButtonProps, "children"> {

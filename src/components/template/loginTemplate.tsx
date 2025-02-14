@@ -1,9 +1,9 @@
 
-import { BrandTitle } from "@/app/components/atoms/brand-title";
-import { Heading } from "@/app/components/atoms/heading";
-import { QrButton } from "@/app/components/atoms/qr-button";
-import { LoginForm } from "@/app/components/organisms/login-form";
-import { Footer } from "@/app/components/organisms/footer";
+import { BrandTitle } from "@/components/atoms/brand-title";
+import { Heading } from "@/components/atoms/heading";
+import { QrButton } from "@/components/atoms/qr-button";
+import { LoginForm } from "@/components/organisms/login-form";
+import { Footer } from "@/components/organisms/footer";
 
 export default function LoginPage() {
     return (

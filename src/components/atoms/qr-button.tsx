@@ -1,5 +1,5 @@
 import { QrCode } from "lucide-react"
-import { Button } from "@/app/components/atoms/button"
+import { Button } from "@/components/atoms/button"
 
 export function QrButton() {
   return (

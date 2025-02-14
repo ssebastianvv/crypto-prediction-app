@@ -1,6 +1,6 @@
-import { Card } from "@/app/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { ArrowUpRight } from "lucide-react"
-import type React from "react" // Added import for React
+import type React from "react"
 
 interface MetricsCardProps {
   title: string

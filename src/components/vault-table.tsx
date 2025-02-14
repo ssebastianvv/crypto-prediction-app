@@ -1,5 +1,5 @@
-import { Avatar } from "@/app/components/ui/avatar"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/components/ui/table"
+import { Avatar } from "@/components/ui/avatar"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { PriceData } from "@/types";
 import { MoreHorizontal } from "lucide-react"
 

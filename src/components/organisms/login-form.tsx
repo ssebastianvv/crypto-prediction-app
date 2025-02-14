@@ -1,12 +1,12 @@
 "use client"
 
-import { Input } from "@/app/components/atoms/input"
-import { Button } from "@/app/components/atoms/button"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/atoms/button"
 import { SocialButton } from "../molecules/social-button"
 
 export function LoginForm() {
   return (
-    <div className="space-y-6 mt-6">
+    <div className="space-y-6 mt-6 bg-grey">
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700">Correo o número de teléfono</label>
         <Input type="text" placeholder="Correo electrónico o teléfono (sin código del país)" className="w-full py-2" />
